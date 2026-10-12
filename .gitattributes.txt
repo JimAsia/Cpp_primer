@@ -1,0 +1,15 @@
+# 自动规范化换行符
+* text=auto
+
+# 明确指定 C/C++ 代码文件的换行符为 LF（Git 仓库内部使用 LF）
+*.cpp text eol=lf
+*.h text eol=lf
+*.hpp text eol=lf
+*.c text eol=lf
+*.txt text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+
+# Windows 专属的脚本文件保留 CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf

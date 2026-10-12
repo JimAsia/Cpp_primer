@@ -1,0 +1,3 @@
+1.24题目使用book.txt进行重定向
+输出result.txt
+Powershell 重定向代码: Get-Content book.txt | .\1_23.exe > result.txt

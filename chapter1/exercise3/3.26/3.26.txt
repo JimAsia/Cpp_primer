@@ -1,0 +1,3 @@
+mid = (beg + end) / 2 容易发生整型溢出
+
+mid = beg + (end - beg) / 2 不会发生整型溢出

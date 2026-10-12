@@ -1,0 +1,14 @@
+# 构建产物
+build/*
+!build/.gitkeep
+bin/
+*.exe
+*.o
+*.obj
+
+# CMake / 编辑器
+compile_commands.json
+CMakeCache.txt
+CMakeFiles/
+.cache/
+.vs/

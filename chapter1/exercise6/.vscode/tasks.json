@@ -1,0 +1,127 @@
+{
+    "version": "2.0.0",
+    // 任务配置文件的版本号，固定写 "2.0.0"
+
+    "tasks": [
+        // 任务列表，可以定义多个编译/构建任务
+        {
+            "type": "cppbuild",
+            // 任务类型，"cppbuild" 表示这是一个 C/C++ 编译任务
+
+            "label": "C/C++: g++.exe build active file",
+            // 任务名称，launch.json 中的 "preLaunchTask" 通过这个名字来调用它
+            // 必须与 launch.json 中的 preLaunchTask 完全一致
+
+            "command": "C:/Users/admin/mingw64/bin/g++.exe",
+            // ⚠️ 编译器的路径，必须是你电脑上真实存在的 g++.exe 位置
+            // 如果路径不对，编译时会报"不是内部或外部命令"
+
+            "args": [
+                // 传给编译器的参数列表，按顺序拼接成完整的编译命令
+                // 最终等价于：g++.exe -fdiagnostics-color=always -g 当前文件 -o 输出文件
+
+                "-fdiagnostics-color=always",
+                // 让编译器的错误/警告信息带颜色显示，方便排查问题
+
+                "-g",
+                // 生成调试信息（debug symbols）
+                // 不加这个参数，F5 调试时断点会失效，无法单步执行
+
+                "-std=c++11",
+                // 指定按 C++11 标准编译（C++ Primer 第 5 版就是按 C++11 讲的）
+                // 不写这一行时，较老的 GCC 默认按 C++98 编译，会莫名其妙地报
+                //   "'auto' changes meaning in C++11"、
+                //   "range-based for loop is not allowed in C++98"、
+                //   "in C++98 'v' must be initialized by constructor, not by '{...}'"
+                // 如果编译器版本较新（GCC 11+），也可以换成 "-std=c++17"
+
+                "${file}",
+                // 当前打开的文件路径（例如 E:\CODE\1_3.cpp）
+                // ⚠️ 这就是为什么这个任务只能编译单文件
+                // 需要多文件请用下面第 2 个任务 "build all sources in folder"
+                // ⚠️ 千万别改成 "${workspaceFolder}/**/*.cpp"：** 会递归把 exercise6
+                // 下所有练习都编进来，每个练习都有 main → multiple definition of 'main'
+
+                "-o",
+                // 指定输出文件的路径，-o 是 g++ 的输出参数
+
+                "${fileDirname}\\${fileBasenameNoExtension}.exe"
+                // 输出的 exe 文件路径
+                // ${fileDirname} = 当前文件所在目录
+                // ${fileBasenameNoExtension} = 当前文件名去掉后缀
+                // 例如当前文件是 1_3.cpp，输出就是同目录下的 1_3.exe
+            ],
+
+            "options": {
+                "cwd": "${fileDirname}"
+                // 编译时的工作目录，设为当前文件所在目录
+                // 影响编译器查找相对路径的头文件和源文件
+            },
+
+            "problemMatcher": ["$gcc"],
+            // 问题匹配器，告诉 VS Code 如何解析编译器的错误输出
+            // "$gcc" 是内置的 GCC 错误格式匹配规则
+            // 匹配后，编译错误会显示在"问题"面板中，点击可跳转到出错行
+
+            "group": {
+                "kind": "build",
+                // 任务分组类型，"build" 表示这是一个构建任务
+                // 这样按 Ctrl+Shift+B 时才能找到并执行它
+
+                "isDefault": true
+                // 设为默认构建任务
+                // 设为 true 后，按 Ctrl+Shift+B 会直接执行这个任务，不需要再选择
+            }
+        },
+
+        {
+            // ============================================================
+            //  任务 2：编译「当前文件所在目录下的所有源文件」——多文件用这个
+            //  · 与任务 1 的唯一区别：${file} 换成了 ${fileDirname}/*.c*
+            //  · ${fileDirname} = 当前文件所在目录，只编这一层，不含子目录
+            //  · *.c* 同时匹配 .cpp / .cc / .cxx（你的 6.3 是 .cc，所以别只写 *.cpp）
+            //  · exe 名仍跟当前文件走：让"含 main() 的那个文件"处于活动状态，
+            //    main.cpp → main.exe
+            //  · 一个目录里只能有一个 main()；两个练习放同一目录会报
+            //    multiple definition of 'main'
+            //  · 编译标准已在 args 里用 "-std=c++11" 固定（与任务 1 一致）
+            //  · 想开警告就补 "-Wall"
+            // ============================================================
+            "type": "cppbuild",
+
+            "label": "C/C++: g++.exe build all sources in folder",
+            // 任务名称，launch.json 里的 preLaunchTask 靠它来调用
+
+            "command": "C:/Users/admin/mingw64/bin/g++.exe",
+
+            "args": [
+                "-fdiagnostics-color=always",
+                "-g",
+                // 生成调试信息，断点必需
+
+                "-std=c++11",
+                // 与任务 1 保持一致；两个任务的编译标准必须一样，
+                // 否则会出现"单文件任务能过、多文件任务报错"这种诡异现象
+
+                "${fileDirname}/*.c*",
+                // 当前文件所在目录下的所有 C++ 源文件，交给 g++ 自己展开通配符
+                // （Windows 的 cmd / PowerShell 不会替你展开 *）
+
+                "-o",
+
+                "${fileDirname}\\${fileBasenameNoExtension}.exe"
+                // 输出：与当前文件同目录同名
+            ],
+
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+
+            "problemMatcher": ["$gcc"],
+
+            "group": "build"
+            // 同组里只有任务 1 是 isDefault，所以 Ctrl+Shift+B 默认还是单文件
+            // 想跑这个任务：Ctrl+Shift+P → Tasks: Run Task → 选它
+        }
+    ]
+}

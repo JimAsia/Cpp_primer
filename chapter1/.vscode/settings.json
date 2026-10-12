@@ -1,0 +1,46 @@
+// ============================================================================
+//  settings.json —— 工作区个性化设置（只对这个文件夹生效，不影响其他项目）
+//  这些是“编辑器显示/行为”的偏好，跟编译成功与否无关
+//
+//  想改成 4 空格缩进：把下面 editor.insertSpaces 改成 true 即可
+// ============================================================================
+{
+  // files.exclude：把指定文件/目录在资源管理器里【隐藏】。
+  // 注意只是隐藏显示，文件仍在磁盘上，编译照常使用。
+  // 作用是让左侧文件树只剩源码，不被编译产物干扰。
+  "files.exclude": {
+    "**/.build": true,   // 我们的编译产物目录（所有 exe 都在这）
+    "**/.vs": true,      // 旧 Visual Studio 工程的缓存（几 MB ~ 几十 MB）
+    "**/x64": true,      // MSVC 的 x64 编译输出目录
+    "**/Debug": true     // MSVC 的 Debug 输出目录
+  },
+
+  // 把某些文件按 C++ 处理，让语法高亮和补全在这些文件里也生效。
+  // 带星号的按后缀匹配；不带星号的是“无扩展名的标准库头文件”，
+  // 某些环境下会打开成纯文本，加上更保险。
+  "files.associations": {
+    "*.tcc": "cpp",
+    "*.h": "cpp",        // 让 .h 按 C++ 解析（默认可能按 C 解析，导致补全不准）
+    "iostream": "cpp",
+    "string": "cpp",
+    "vector": "cpp"
+  },
+
+  // C/C++ 扩展的默认值（当 c_cpp_properties.json 没有覆盖时生效）。
+  // 这里与 c_cpp_properties.json 保持一致，避免“两个标准打架”。
+  "C_Cpp.default.cppStandard": "c++17",
+  "C_Cpp.default.intelliSenseMode": "windows-gcc-x64",
+
+  // 是否在编辑时实时显示错误波浪线。
+  //   enabled  = 边写边标红（默认，方便）
+  //   disabled = 关掉波浪线（大项目里能省 CPU，但发现问题靠编译）
+  "C_Cpp.errorSquiggles": "enabled",
+
+  // 新开终端时的初始目录 = 工作区根目录
+  "terminal.integrated.cwd": "${workspaceFolder}",
+
+  // ---- 缩进风格：与《C++ Primer》配套代码一致，用制表符(Tab) ----
+  "editor.tabSize": 4,             // 一个 Tab 显示为 4 个空格宽
+  "editor.insertSpaces": false,    // 按 Tab 时插入真正的 \t，而不是 4 个空格
+  "editor.detectIndentation": false // 不根据文件内容自动猜缩进，始终用上面两行
+}

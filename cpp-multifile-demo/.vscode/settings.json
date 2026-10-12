@@ -1,0 +1,17 @@
+{
+    // ---------------- CMake Tools 扩展（ms-vscode.cmake-tools） ----------------
+    "cmake.buildDirectory": "${workspaceFolder}/build",
+    // 用 MinGW 就保留这行；用 Visual Studio / MSVC 编译请删掉它
+    "cmake.generator": "MinGW Makefiles",
+    "cmake.configureOnOpen": false,
+    "cmake.configureArgs": ["-DCMAKE_BUILD_TYPE=Debug"],
+
+    // ---------------- C/C++ 扩展（ms-vscode.cpptools） ----------------
+    "C_Cpp.default.cppStandard": "c++17",
+    "C_Cpp.default.compilerPath": "C:/Users/admin/mingw64/bin/g++.exe",
+
+    // 让 .h 按 C++ 高亮（默认有时会当 C 处理）
+    "files.associations": {
+        "*.h": "cpp"
+    }
+}

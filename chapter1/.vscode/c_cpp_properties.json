@@ -1,0 +1,64 @@
+// ============================================================================
+//  c_cpp_properties.json —— IntelliSense（代码补全 / 跳转 / 错误波浪线）配置
+//
+//  它【不参与编译】，只影响编辑器里的智能提示。
+//  真正决定编译能不能过的是 build.ps1，两者标准要一致（这里 c++17）。
+//
+//  改完这个文件后，如果补全还是不对：
+//    Ctrl+Shift+P → 输入 "C/C++: Reset IntelliSense Database"，或直接重载窗口
+// ============================================================================
+{
+  // schema 版本，固定写 4
+  "version": 4,
+  "configurations": [
+    {
+      // 配置名（如果装了多个编译器可以建多份，用右下角状态栏切换）
+      "name": "C++ Primer (g++ UCRT64)",
+
+      // ★ 最关键的一行：告诉 IntelliSense 用哪个编译器。
+      // C/C++ 扩展会自己去问这个 g++ “你的系统头文件在哪”，
+      // 于是 <iostream>/<vector> 这类标准库头文件就自动能被补全和跳转，
+      // 不需要手工往 includePath 里加一堆路径。
+      // 换编译器时改这一行即可。
+      "compilerPath": "C:\\msys64\\ucrt64\\bin\\g++.exe",
+
+      // 模拟传给编译器的高频参数，让 IntelliSense 与真实编译保持一致。
+      // 写了这行后，下面的 cppStandard 会被它覆盖，所以两处标准要同步改。
+      "compilerArgs": [
+        "-std=c++17"
+      ],
+
+      // C 语言标准（这个工作区基本用不到，保持默认即可）
+      "cStandard": "c17",
+
+      // C++ 语言标准。练习《C++ Primer》用 c++17 足够；
+      // 若你的习题必须用 C++11，可改成 "c++11"（同时改上面的 compilerArgs）。
+      "cppStandard": "c++17",
+
+      // IntelliSense 的解析模式，必须与工具链匹配：
+      //   windows-gcc-x64  = Windows + GCC(MinGW) + 64 位
+      // 写错的典型症状：标准库头文件全部报“找不到源文件”、跳转失效。
+      // 其他常见值：windows-msvc-x64（MSVC）、linux-gcc-x64、macos-clang-x64
+      "intelliSenseMode": "windows-gcc-x64",
+
+      // 额外头文件搜索路径。
+      // "${workspaceFolder}/**" 表示递归包含工作区所有子目录，
+      // 这样你在任何 exerciseN 目录里写 #include "Sales_data.h" 都能被找到。
+      // 注意：这里不能用 ${fileDirname}（该变量只在 tasks/launch 里有效）。
+      "includePath": [
+        "${workspaceFolder}/**"
+      ],
+
+      // browse 用于“转到定义/查找所有引用”的符号索引（tag parser）
+      "browse": {
+        // 参与索引的目录，与上面的 includePath 保持一致即可
+        "path": [
+          "${workspaceFolder}"
+        ],
+        // true = 只为“被 include 到的头文件”建索引，可显著减少内存占用，
+        // 也避免把 .build 里的无关文件扫进来
+        "limitSymbolsToIncludedHeaders": true
+      }
+    }
+  ]
+}

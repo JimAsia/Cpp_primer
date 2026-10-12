@@ -1,0 +1,31 @@
+// 5.7
+1.
+if (ival1 != ival2)
+    ival1 = ival2;
+else
+    ival1 = ival2 = 0;
+
+2.
+if (ival < minval) {
+    minval = ival;
+    occurs = 1;
+}
+
+3.
+int ival = get_value();
+if (ival)
+    cout << "ival = " << ival << endl;
+if (!ival)
+    cout << "ival = 0\n";
+
+4.
+if (ival == 0)
+    ival = get_value();
+
+// 5.8
+悬垂else问题是指在嵌套的if-else语句中，当if子句数量多于else子句时，
+编译器无法从语法上唯一确定每个else子句应与哪个if子句配对，从而产生歧义。
+这种二义性被称为“悬垂else”（dangling-else）问题。
+
+C++语言处理else子句的规则是：else子句总是与它前面最近的、尚未配对的if语句配对，与代码的缩进或格式无关。
+这种规则消除了语法上的二义性，使编译器能够明确解析嵌套条件语句。

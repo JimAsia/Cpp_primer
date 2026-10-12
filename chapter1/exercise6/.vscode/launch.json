@@ -1,0 +1,109 @@
+{
+    "version": "0.2.0",
+    // 调试配置文件的版本号，固定写 "0.2.0" 即可
+
+    "configurations": [
+        // 调试配置列表，可以写多个不同的调试方案，这里只有一个
+        {
+            "name": "C/C++: g++.exe build and debug active file",
+            // 配置名称，显示在 VS Code 调试面板的下拉菜单中，可随意修改
+
+            "type": "cppdbg",
+            // 调试器类型，固定为 "cppdbg"，表示使用 C/C++ 调试扩展
+
+            "request": "launch",
+            // 调试方式："launch" = 启动新程序调试；"attach" = 附加到已运行的进程
+
+            "program": "${fileDirname}\\${fileBasenameNoExtension}.exe",
+            // 要调试的 exe 文件路径（之前报错的核心字段）
+            // ${fileDirname} = 当前 .cpp 文件所在目录
+            // ${fileBasenameNoExtension} = 当前文件名去掉后缀
+            // 例如当前文件是 1_3.cpp，则自动解析为同目录下的 1_3.exe
+
+            "args": [],
+            // 传给程序的命令行参数，空数组表示不传参数
+            // 需要传参时写成 ["参数1", "参数2"]
+
+            "stopAtEntry": false,
+            // 是否在 main 函数入口自动暂停
+            // false = 直接跑到第一个断点；true = 程序一启动就暂停
+
+            "cwd": "${fileDirname}",
+            // 程序运行时的工作目录，影响相对路径的文件读写
+
+            "environment": [],
+            // 额外的环境变量，空数组表示用系统默认的
+
+            "externalConsole": false,
+            // 是否弹出独立的黑色命令行窗口
+            // false = 输出显示在 VS Code 内置终端
+            // true = 弹出独立窗口（适合需要键盘输入的程序）
+
+            "MIMode": "gdb",
+            // 调试器协议，Windows + MinGW 用 "gdb"，macOS 用 "lldb"
+
+            "miDebuggerPath": "C:/Users/admin/mingw64/bin/gdb.exe",
+            // GDB 调试器的实际路径，必须是你电脑上真实存在的位置
+            // 如果你用的是 MSYS2，路径可能是 C:/msys64/ucrt64/bin/gdb.exe
+            // 路径不对会导致调试器无法启动
+
+            "setupCommands": [
+                // 调试器启动时自动执行的 GDB 命令
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    // 这条命令的说明
+
+                    "text": "-enable-pretty-printing",
+                    // 启用 STL 容器（vector、map 等）的友好显示
+                    // 调试时能直接看到容器内容，而不是原始内存地址
+
+                    "ignoreFailures": true
+                    // 命令执行失败时是否忽略，true = 忽略继续运行
+                }
+            ],
+
+            "preLaunchTask": "C/C++: g++.exe build active file"
+            // 按 F5 调试前自动执行的编译任务名称
+            // 必须与 tasks.json 中的 "label" 字段完全一致
+            // 设置后按 F5 会自动先编译再调试，防止运行旧版本代码
+        },
+
+        {
+            // ============================================================
+            //  多文件调试：先跑「任务 2」编译同目录所有源文件，再启动调试
+            //  · program 必须和任务 2 的 -o 输出一致（当前文件同名的 .exe）
+            //  · F5 时在调试面板左上角的下拉里选这一项
+            //  · 想让多文件成为 F5 的默认行为，就把这一整段移到
+            //    "configurations" 数组的第一位（第一项 = 默认项）
+            // ============================================================
+            "name": "C/C++: g++.exe build and debug all sources in folder",
+            // 配置名称，显示在调试面板的下拉菜单里
+
+            "type": "cppdbg",
+            "request": "launch",
+
+            "program": "${fileDirname}\\${fileBasenameNoExtension}.exe",
+            // 当前文件同目录同名的 exe，与任务 2 的输出路径一一对应
+
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": false,
+
+            "MIMode": "gdb",
+            "miDebuggerPath": "C:/Users/admin/mingw64/bin/gdb.exe",
+
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+
+            "preLaunchTask": "C/C++: g++.exe build all sources in folder"
+            // 必须与 tasks.json 里任务 2 的 label 完全一致
+        }
+    ]
+}

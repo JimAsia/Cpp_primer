@@ -1,0 +1,184 @@
+// ============================================================================
+//  tasks.json —— 编译任务定义（Ctrl+Shift+B 的入口）
+//  适用：VS Code + g++ (MSYS2 UCRT64) + 《C++ Primer》练习
+//  真正的编译逻辑不在这里，而在同目录的 build.ps1（它负责单文件/多文件判断）
+//
+//  【常用变量速查】VS Code 会在执行前替换掉 ${...}
+//    ${file}                      当前编辑器的文件完整路径
+//    ${fileBasenameNoExtension}   该文件名（不含扩展名），如 main
+//    ${fileDirname}               该文件所在目录
+//    ${workspaceFolder}           工作区根目录
+//  【注意】用 VS Code 右上角的“运行”三角形时默认走调试（F5）而不是这里的任务。
+// ============================================================================
+{
+  // 固定写法，别改
+  "version": "2.0.0",
+  "tasks": [
+    {
+      // 任务名，会显示在“终端 → 运行任务”列表里。
+      // 注意：launch.json 的 preLaunchTask 必须与本名字完全一致，改名要两边一起改。
+      "label": "C++: 编译当前文件",
+
+      // 鼠标悬停在任务上时的提示文字
+      "detail": "编译正在编辑的 .cpp。若该目录下还有别的 .cpp，则一起编译成多文件程序。",
+
+      // type=shell 表示“在终端里执行一条命令”
+      "type": "shell",
+
+      // 用 cmd.exe 执行，而不是直接让 VS Code 调 PowerShell。
+      // 这样 ${file} 里即使有空格或中文，参数传递也最稳（实测结论）
+      "command": "cmd",
+      "args": [
+        "/d", // cmd 启动时不执行 AutoRun 注册表命令
+        "/c", // 执行完命令后退出 cmd
+        // 核心命令行：调用 build.ps1 编译 ${file}
+        //   -NoProfile                不加载 PowerShell 个人配置，避免被你的 profile 干扰
+        //   -ExecutionPolicy Bypass   绕过脚本执行策略（否则 .ps1 可能被系统禁止运行）
+        //   -Target <文件>            要编译的源文件
+        //   -OutDir <目录>            exe 输出到工作区下的 .build
+        //   -Mode debug               带 -g -gdwarf-4 -O0，可断点单步
+        "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}\\.vscode\\build.ps1\" -Target \"${file}\" -OutDir \"${workspaceFolder}\\.build\" -Mode debug"
+      ],
+
+      // 任务的工作目录：决定相对路径怎么算、终端初始停在哪个目录
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+
+      // $gcc 是 VS Code 内置的错误解析器：把 g++ 的报错抓成
+      // “问题”面板里的条目，并在编辑器里划红色波浪线。
+      // 如果报错没有波浪线、或行号错乱，先检查这里有没有被改动。
+      "problemMatcher": [
+        "$gcc"
+      ],
+
+      // isDefault: true → 按 Ctrl+Shift+B 时执行的就是这个任务
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+
+      // reveal: always → 每次编译都切到终端面板显示输出
+      // panel:  shared → 所有任务共用同一个终端面板，不会开一堆
+      // clear:  true   → 每次运行前清屏，只看本次结果
+      // echo:   true   → 把实际执行的命令打印出来，便于排查
+      // focus:  false  → 不抢走编辑器焦点（编译时还能继续敲代码）
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true,
+        "echo": true,
+        "focus": false
+      }
+    },
+
+    {
+      "label": "C++: 编译并运行当前文件",
+      "detail": "编译成功后立刻运行，做习题时最常用。",
+
+      // 这条命令是 A && B：A（编译）成功才会执行 B（运行）。
+      // 这样编译失败时绝不会去运行上一次的旧 exe，避免“看到的其实是旧结果”。
+      "type": "shell",
+      "command": "cmd",
+      "args": [
+        "/d",
+        "/c",
+        // 前半段编译，后半段运行 .build\<文件名>.exe（与产物命名规则一致）
+        "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}\\.vscode\\build.ps1\" -Target \"${file}\" -OutDir \"${workspaceFolder}\\.build\" -Mode debug && \"${workspaceFolder}\\.build\\${fileBasenameNoExtension}.exe\""
+      ],
+
+      // 运行时的工作目录 = 源码所在目录。
+      // 于是代码里用相对路径读文件（如 ifstream("data.txt")）时，
+      // 文件就在源文件旁边，符合直觉。
+      "options": {
+        "cwd": "${fileDirname}"
+      },
+      "problemMatcher": [
+        "$gcc"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      }
+    },
+
+    {
+      "label": "C++: 编译当前文件 (Release / -O2)",
+      "detail": "开优化编译，用于对比性能。",
+
+      // 与默认任务唯一区别：-Mode release（build.ps1 会改用 -O2 并去掉 -g）
+      // 注意：Release 版没有调试信息，断点和单步会不准，别用 F5 调它
+      "type": "shell",
+      "command": "cmd",
+      "args": [
+        "/d",
+        "/c",
+        "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}\\.vscode\\build.ps1\" -Target \"${file}\" -OutDir \"${workspaceFolder}\\.build\" -Mode release"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [
+        "$gcc"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      }
+    },
+
+    {
+      "label": "C++: 编译当前文件 (C++11 标准)",
+      "detail": "《C++ Primer》绝大部分练习用 C++11 即可；需要 C++14/17 特性时改用默认任务。",
+
+      // -MoreArgs 的参数会被追加到 g++ 命令行的【最后面】。
+      // build.ps1 里已先放了 -std=c++17，而 g++ 以最后一个 -std 为准，
+      // 所以这里再给 -std=c++11 才能真正覆盖默认值（实测 __cplusplus = 201103）。
+      "type": "shell",
+      "command": "cmd",
+      "args": [
+        "/d",
+        "/c",
+        "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}\\.vscode\\build.ps1\" -Target \"${file}\" -OutDir \"${workspaceFolder}\\.build\" -Mode debug -MoreArgs \"-std=c++11\""
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [
+        "$gcc"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      }
+    },
+
+    {
+      "label": "C++: 清理 .build 里的可执行文件",
+      "detail": "删掉编译产物，源码不受影响。",
+
+      // 纯 cmd 命令，不经过 PowerShell：
+      //   if exist ... 先判断目录在不在，避免报“找不到路径”
+      //   del /q       静默删除（不弹确认）
+      // 只删 *.exe，绝不碰你的 .cpp / .h 源码
+      "type": "shell",
+      "command": "cmd",
+      "args": [
+        "/d",
+        "/c",
+        "if exist \"${workspaceFolder}\\.build\" (del /q \"${workspaceFolder}\\.build\\*.exe\" & echo [clean] removed .build\\*.exe) else (echo [clean] nothing to do)"
+      ],
+
+      // 空数组：这个任务不会产生编译错误，不需要错误解析器
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      }
+    }
+  ]
+}
