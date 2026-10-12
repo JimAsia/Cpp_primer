@@ -9,6 +9,7 @@
 *.lib
 
 # 编译缓存和构建目录
+.build/
 build/
 bin/
 obj/
@@ -17,5 +18,3 @@ Release/
 
 # IDE 配置文件（根据你用的工具选择，通常不上传）
 .vscode/
-.idea/
-*.user
