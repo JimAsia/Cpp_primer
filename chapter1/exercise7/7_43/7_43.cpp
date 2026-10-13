@@ -14,7 +14,7 @@ private:
 	int a;
 };
 
-static NoDefault allN(1);
+
 
 class C
 {
@@ -23,8 +23,11 @@ public:
 	C(NoDefault no = allN) : n(no) {cout << " C(NoDefault no = allN) " << endl; }
 
 	NoDefault n;
-
+private:
+	static NoDefault allN;
 };
+
+NoDefault C::allN(1);
 
 int main()
 {
