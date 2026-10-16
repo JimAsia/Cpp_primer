@@ -52,7 +52,9 @@ int main()
 		std::cerr << "打不开 saleData.md: 请确认运行任务的工作目录 = 本文件所在目录" << std::endl;
 		return -1;
 	}
-	std::ofstream output("Data.md");   // 分组结果同时写一份到文件
+	std::ofstream output;   // 分组结果同时写一份到文件
+	// exercise 8.8
+	output.open("Data.md", std::ofstream::app);  // 模式更改为输出和追加
 
 	Sales_data sum;
 	if (!read(input, sum)) {           // 一条都没读进来: 空文件或格式不对
@@ -81,5 +83,7 @@ int main()
 	std::cout << "默认构造后 units_sold = " << copy.units_sold
 	          << ", avg_price() = " << copy.avg_price()
 	          << "  (0 本时不会除以 0)" << std::endl;
+	output.clear();
+	input.clear();
 	return 0;
 }
