@@ -15,7 +15,9 @@ int main()
 	// difference_type 表示两个迭代器之间的距离
 	// difference_type 是容器（如 vector、list）和迭代器定义的一种有符号整数类型。
 	vector<int>::difference_type count = i.end() - i.begin();
-	vector<string>::iterator iter;
+	vector<string>::iterator iter = s.begin();
+	return 0;
+}
 	/*
 	9.7
 	vector<int>::size_type
@@ -29,4 +31,3 @@ int main()
 	读取：如果 list 是 const 的，或者你只想读取不想修改，可以使用 list<string>::const_iterator；如果只是普通读取，直接用 list<string>::iterator 也可以。
 	写入：题目问“如果写入”，说明这个 list 对象不是 const 的，你需要使用普通的 list<string>::iterator。通过这个迭代器解引用（*iter），你可以修改里面的 string 元素。const_iterator 只能读不能写。
 	*/
-}
